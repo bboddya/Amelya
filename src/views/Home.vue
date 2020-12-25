@@ -1,18 +1,40 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Header />
+    <h1>Main page</h1>
+    <hr>
+
+    <pre>{{posts}}</pre>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import server from '@/server';
+import Header from '@/components/Header'
 
 export default {
   name: 'Home',
-  components: {
-    HelloWorld
+  comments: {
+    Header
+  },
+  data() {
+    return {
+      posts: null
+    }
+  },
+  computed: {
+    loading() {
+      return this.posts === null;
+    }
+  },
+  async created() {
+    let response = await server.get('wp/v2/posts');
+    this.posts = response.data.map(post => ({
+      id: post.id,
+      title: post.title.rendered,
+      excerpt: post.excerpt.rendered,
+    }))
   }
 }
 </script>
